@@ -1,0 +1,1 @@
+ETCD_OPTS="-name master -advertise-client-urls http://192.168.2.123:2379 -initial-advertise-peer-urls http://192.168.2.123:2380 -listen-client-urls http://0.0.0.0:2379 -listen-peer-urls http://192.168.2.136:2380 -initial-cluster-token k8s_etcd -initial-cluster master=http://192.168.2.123:2380 -initial-cluster-state new"

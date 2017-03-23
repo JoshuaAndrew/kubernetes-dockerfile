@@ -1,0 +1,1 @@
+ETCD_OPTS="-name 192.168.2.124 -advertise-client-urls http://192.168.2.124:2379 -listen-client-urls http://0.0.0.0:2379 -initial-cluster master=http://192.168.2.123:2380 -proxy on"
