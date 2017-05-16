@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-v1.5.2
+  namespace: kube-system
+  labels:
+    k8s-app: prometheus
+    kubernetes.io/cluster-service: "true"
+    version: v1.5.2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: prometheus
+      version: v1.5.2
+  template:
+    metadata:
+      labels:
+        k8s-app: prometheus
+        version: v1.5.2
+        kubernetes.io/cluster-service: "true"
+    spec:
+      containers:
+        - image: registry.h3cpaas.com/prometheus/prometheus:v1.5.2
+          name: prometheus
+          resources:
+            # keep request = limit to keep this container in guaranteed class
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          ports:
+            - containerPort: 9090
+          command:
+            - "/bin/prometheus"
+          args:
+            - "-config.file=/etc/prometheus/prometheus.yml"
+            - "-storage.local.path=/prometheus"
+            - "-storage.local.retention=24h"
+            - "-web.console.libraries=/usr/share/prometheus/console_libraries"
+            - "-web.console.templates=/usr/share/prometheus/consoles"
+            - "-alertmanager.url=http://alertmanager.kube-system.svc:9093"
+          volumeMounts:
+             - name: prometheus
+               mountPath: "/etc/prometheus"
+      volumes:
+        - name: prometheus
+          configMap:
+            name: prometheus-configmap

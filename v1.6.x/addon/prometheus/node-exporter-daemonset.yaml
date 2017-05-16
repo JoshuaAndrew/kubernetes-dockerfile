@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      name: node-exporter
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - image: registry.h3cpaas.com/prometheus/node-exporter:v0.13.0
+        name: node-exporter
+        args:
+        - -collector.procfs /host/proc
+        - -collector.sysfs /host/sys
+        - -collector.filesystem.ignored-mount-points '^/(sys|proc|dev|host|etc)($|/)'
+        ports:
+        - containerPort: 9100
+          hostPort: 9100
+          name: scrape
+        volumeMounts:
+          - mountPath: "/host/proc"
+            name: proc
+          - mountPath: "/host/sys"
+            name: sys
+          - mountPath: "/rootfs"
+            name: root
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys 
+          hostPath:
+            path: /sys
+        - name: root
+          hostPath:
+            path: /

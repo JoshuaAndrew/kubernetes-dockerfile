@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grafana-v4.1.2
+  namespace: kube-system
+  labels: 
+    k8s-app: prometheusGrafana
+    version: v4
+    kubernetes.io/cluster-service: "true"
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels:
+      k8s-app: prometheusGrafana
+      version: v4
+  template: 
+    metadata: 
+      labels: 
+        k8s-app: prometheusGrafana
+        version: v4
+        kubernetes.io/cluster-service: "true"
+    spec: 
+      containers: 
+        - image: registry.h3cpaas.com/prometheus/grafana:4.1.2
+          name: grafana
+          env:
+          resources:
+            # keep request = limit to keep this container in guaranteed class
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - containerPort: 3000
+          env:
+              # The following env variables are required to make Grafana accessible via
+              # the kubernetes api-server proxy. On production clusters, we recommend
+              # removing these env variables, setup auth for grafana, and expose the grafana
+              # service using a LoadBalancer or a public IP.
+            - name: GF_AUTH_BASIC_ENABLED
+              value: "false"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: Admin
+            - name: GF_SERVER_ROOT_URL
+              value: /api/v1/proxy/namespaces/kube-system/services/grafana/
+
