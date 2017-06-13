@@ -1,27 +1,27 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: heapster-v1.2.0
+  name: heapster-v1.3.0
   namespace: kube-system
   labels:
     k8s-app: heapster
     kubernetes.io/cluster-service: "true"
-    version: v1.2.0
+    version: v1.3.0
 spec:
   replicas: 1
   selector:
     matchLabels:
       k8s-app: heapster
-      version: v1.2.0
+      version: v1.3.0
   template:
     metadata:
       labels:
         k8s-app: heapster
-        version: v1.2.0
+        version: v1.3.0
         kubernetes.io/cluster-service: "true"
     spec:
       containers:
-        - image: registry.h3cpaas.com/google_containers/heapster:v1.2.0
+        - image: registry.h3cpaas.com/google_containers/heapster:v1.3.0
           name: heapster
           livenessProbe:
             httpGet:
@@ -45,7 +45,7 @@ spec:
           volumeMounts:
           - name: etc
             mountPath: /etc/kubernetes
-        - image: registry.h3cpaas.com/google_containers/heapster:v1.2.0
+        - image: registry.h3cpaas.com/google_containers/heapster:v1.3.0
           name: eventer
           resources:
             # keep request = limit to keep this container in guaranteed class
@@ -62,7 +62,7 @@ spec:
           volumeMounts:
           - name: etc
             mountPath: /etc/kubernetes
-        - image: registry.h3cpaas.com/google_containers/addon-resizer:1.6
+        - image: registry.h3cpaas.com/google_containers/addon-resizer:1.7
           name: heapster-nanny
           resources:
             limits:
@@ -87,11 +87,11 @@ spec:
             - --memory=140Mi
             - --extra-memory=4Mi
             - --threshold=5
-            - --deployment=heapster-v1.2.0
+            - --deployment=heapster-v1.3.0
             - --container=heapster
             - --poll-period=300000
             - --estimator=exponential
-        - image: registry.h3cpaas.com/google_containers/addon-resizer:1.6
+        - image: registry.h3cpaas.com/google_containers/addon-resizer:1.7
           name: eventer-nanny
           resources:
             limits:
@@ -116,7 +116,7 @@ spec:
             - --memory=190Mi
             - --extra-memory=500Ki
             - --threshold=5
-            - --deployment=heapster-v1.2.0
+            - --deployment=heapster-v1.3.0
             - --container=eventer
             - --poll-period=300000
             - --estimator=exponential
