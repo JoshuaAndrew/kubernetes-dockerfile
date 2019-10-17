@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: elasticsearch-logging
+  labels:
+    plugin: elasticsearch-logging  
+    component: elasticsearch
+    role: client
+spec:
+  type: ClusterIP
+  selector:
+    plugin: elasticsearch-logging  
+    component: elasticsearch
+    role: client
+  ports:
+  - name: http
+    port: 9200
+    protocol: TCP

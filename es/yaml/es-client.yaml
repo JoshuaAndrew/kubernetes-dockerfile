@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  name: es-client
+  labels:
+    component: elasticsearch
+    role: client
+    plugin: elasticsearch-logging
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      plugin: elasticsearch-logging    
+      component: elasticsearch
+      role: client 
+  template:
+    metadata:
+      labels:
+        plugin: elasticsearch-logging
+        component: elasticsearch
+        role: client
+    spec:
+      serviceAccount: elasticsearch-logging
+      nodeSelector:
+        "kube-system/es-node": "true"
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.tenxcloud.com/es
+      containers:
+      - name: es-client
+        securityContext:
+          privileged: false
+          capabilities:
+            add:
+              - IPC_LOCK
+              - SYS_RESOURCE
+        image: 10.5.79.237/system_containers/docker-elasticsearch-kubernetes:5.6.0
+        imagePullPolicy: Always
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: "CLUSTER_NAME"
+          value: "es-cluster"
+        - name: NODE_MASTER
+          value: "false"
+        - name: NODE_DATA
+          value: "false"
+        - name: NODE_INGEST
+          value: "false"          
+        - name: HTTP_ENABLE
+          value: "true"
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms4g -Xmx4g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+        ports:
+        - containerPort: 9200
+          name: http
+          protocol: TCP
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 2
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 4Gi
